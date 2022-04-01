@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Speedtest Custom - Test your internet speeds</title>
+    <link rel="stylesheet" type="text/css"
+        href="https://c.speedtestcustom.com/static/css/gauge.min.css?v=1646866193322" />
+    <script>
+        // todo: maybe put it in the speed test "testBundle.js" so that it execute that async and show "finding server" to user
+        const request = new XMLHttpRequest();
+        request.open('GET', 'https://mixte-proxy.herokuapp.com/https://fast.com/', false);
+        request.send();
+
+        var fastcom_main_script_matches = /\<script src=\"(\/app-.{3,8}[.]js)\">\<\/script\>/.exec(request.responseText);
+
+        var fastcom_main_script = fastcom_main_script_matches[1]
+
+        console.log(fastcom_main_script)
+
+        request.open('GET', 'https://mixte-proxy.herokuapp.com/https://fast.com' + fastcom_main_script, false);
+        request.send();
+
+        console.log(request.responseText)
+
+        var fastcom_token_matches = /token[:]\"(.+?(?=[\",]))\"/.exec(request.responseText)
+        var fastcom_token = fastcom_token_matches[1]
+        console.log(fastcom_token)
+
+        request.open('GET', `https://httpbingo.org/redirect-to?status_code=302&url=${encodeURIComponent(`https://api.fast.com/netflix/speedtest/v2?https=true&token=${fastcom_token}&urlCount=5`)}`, false);
+        request.send();
+
+        /**
+         * @type 
+         */
+        const fastcom_data = JSON.parse(request.responseText);
+
+        request.open('GET', `https://ipwhois.app/json/`, false);
+        request.send();
+
+        /**
+         * @type {{"ip":"","success":true,"type":"IPv4","continent":"North America","continent_code":"NA","country":"Canada","country_code":"CA","country_flag":"https://cdn.ipwhois.io/flags/ca.svg","country_capital":"Ottawa","country_phone":"+1","country_neighbours":"US","region":"Québec","city":"Montreal","latitude":8.5016889,"longitude":-8.567256,"asn":"AS577","org":"Bell Canada","isp":"Bell Canada","timezone":"America/Toronto","timezone_name":"Eastern Standard Time","timezone_dstOffset":0,"timezone_gmtOffset":-18000,"timezone_gmt":"GMT -5:00","currency":"Canadian Dollar","currency_code":"CAD","currency_symbol":"$","currency_rates":1.248,"currency_plural":"Canadian Dollars","completed_requests":11}}
+         */
+        const myIpData = JSON.parse(request.responseText)
+
+
+        window.ST_PARAMS = {
+            'fastcom_data': fastcom_data,
+            "subdomain": "fast-com-dummy",
+            "testConfiguration": {
+                "testConfigurationId": 116,
+                "subscriptionId": 69,
+                "subdomain": "bellcanada",
+                "createdDate": "2017-03-06T23:04:38.000Z",
+                "modifiedDate": "2018-03-07T12:52:29.000Z",
+                "allowedServers": 0,
+                "serverNetwork": "speedtest",
+                "dataProtectionContactId": 0,
+                "resellerContactId": 0,
+                "apiKey": null,
+                "originHost": null,
+                "autoStart": false,
+                "clientIcon": "user",
+                "customCssFile": "",
+                "customerServers": [],
+                "distanceUnits": "km",
+                "embedUrls": [],
+                "hostSelectDisabled": false,
+                "httpsOnly": false,
+                "isActive": true,
+                "isUpgradeDisabled": true,
+                "allowSpeedtestUrls": false,
+                "logo": {
+                    "name": "https://fast.com/assets/poweredby-865a3b.svg",
+                    "cdnFileName": "https://fast.com/assets/poweredby-865a3b.svg"
+                },
+                "passwordProtected": false,
+                "themeColors": {
+                    "backgroundColor": "#ffffff",
+                    "primaryColor": "#d72433"
+                },
+                "serverIcon": "video",
+                "speedLabel": "Mbps",
+                "defaultMaxSpeed": "2g",
+                "testTypes": [
+                    "ping",
+                    "download",
+                    "upload",
+                   // "jitter"
+                ],
+                "ipServerAssignment": {
+                    "allowed": false,
+                    "enabled": false
+                },
+                "isPaid": true,
+                "isEUCountry": false
+            },
+            "config": {
+                "rootDomain": "speedtestcustom.com",
+                "logoCdnUrl": "",
+                "countriesWithVat": [
+                    "AT",
+                    "BE",
+                    "BG",
+                    "HR",
+                    "CY",
+                    "CZ",
+                    "DK",
+                    "EE",
+                    "FI",
+                    "FR",
+                    "DE",
+                    "GR",
+                    "HU",
+                    "IE",
+                    "IT",
+                    "LV",
+                    "LT",
+                    "LU",
+                    "MT",
+                    "NL",
+                    "PL",
+                    "PT",
+                    "RO",
+                    "SK",
+                    "SI",
+                    "ES",
+                    "SE",
+                    "GB"
+                ],
+                "premiumSubscriptionBasePrice": 1995,
+                "premiumSubscriptionServerPrice": 995,
+                "auth0": {
+                    "domain": "ookla.auth0.com",
+                    "clientId": "qZ22rLQ3HmY102QN05DIQGqFkz3AHdFr",
+                    "loginRedirectUrl": "https:\u002F\u002Faccount.speedtestcustom.com",
+                    "logoutRedirectUrl": "https:\u002F\u002Faccount.speedtestcustom.com\u002Flogin",
+                    "forgotPasswordLink": "https:\u002F\u002Faccount.speedtestcustom.com\u002Freset-password",
+                    "authorization": {
+                        "audience": "https:\u002F\u002Fapi.st-connect.com"
+                    },
+                    "management": {
+                        "connection": "OOKLA-AUTH"
+                    }
+                },
+                "privacyPolicyUpdated": "2018-05-18"
+            },
+            "testReport": null,
+            "serverList": [],
+            "testGlobals": {
+                "ipAddress": fastcom_data.client.ip,
+                "ispName": fastcom_data.client.isp,
+                "ispId": 69,
+                "location": {
+                    "latitude": myIpData.latitude,
+                    "longitude": myIpData.longitude,
+                    "cityName": myIpData.city,
+                    "countryCode": myIpData.country_code,
+                    "countryName": myIpData.country,
+                    "regionCode": "",
+                    "regionName": myIpData.region
+                }
+            },
+            "testSuiteGuid": false,
+            "engineOverrides": false,
+            "shaper": false,
+            "logging": {
+                "jwtToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjMwYjQwOGVkLWQ3N2EtNGY1Yy04MWQyLTcyMmQ5ZTIwN2I5ZCIsInR5cGUiOiJoZWFkZXIifQ.4Rywl3x--GAOPXPsItjkT8gf6AbQGao3FqWXY_alQjo",
+                "buildId": 1646866193322,
+                "level": "info"
+            },
+            "engine": {}
+        }
+    </script>
+</head>
+
+<body style='margin:0;padding:0;height:100%;'>
+    <div id="root"></div>
+    <script src="js/testBundle.js"></script>
+</body>
+
+</html>
