@@ -59908,7 +59908,7 @@
         this.result.upload && (this.result.upload.mbytes = this.result.upload.speed / 125e3), this.result.download && (this.result.download.mbytes = this.result.download.speed / 125e3);
         var a = this._parseServerHost(this.server),
           i = {
-            serverid: 49524,
+            serverid: 49526,
             testmethod: [this.result.latency ? this.result.latency.connectionProtocol : null, this.result.download ? this.result.download.connectionProtocol : null, this.result.upload ? this.result.upload.connectionProtocol : null].join(","),
             hash: (0, r.default)("".concat(this.result.latency ? this.result.latency.ping : 0, "-").concat(n, "-").concat(o, "-817d699764d33f89c")),
             source: t.jsEngine.saveType,
