@@ -4,60 +4,93 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    	<meta name="keywords" lang="en"
-		content="ookla,speed,test,fast.com,netflix,speedtest,speed test,bandwidth speed test,internet speed test,broadband speed test,speakeasy,flash,cnet,internet,network,connection,broadband,bandwidth,latency,ping,throughput,download,upload,connection,dsl,adsl,cable,t1,isp,voip,ip,ip address,tcp" />
+    <meta name="description"
+        content="How fast is your download speed? In seconds, FAST.com's simple Internet speed test will estimate your ISP speed using speedtest.net modern interface." />
+    <meta name="keywords" lang="en"
+        content="ookla,speed,test,fast.com,netflix,speedtest,speed test,bandwidth speed test,internet speed test,broadband speed test,speakeasy,flash,cnet,internet,network,connection,broadband,bandwidth,latency,ping,throughput,download,upload,connection,dsl,adsl,cable,t1,isp,voip,ip,ip address,tcp" />
 
-	<meta property="og:type" content="website" />
-	<meta property="og:title" content="Speedtest by Ookla - Using Netflix's server" />
-	<meta property="og:description"
-		content="How fast is your download speed? In seconds, FAST.com's simple Internet speed test will estimate your ISP speed using speedtest.net modern interface." />
-	<meta property="og:site_name" content="Speedtest.net" />
-	<meta property="og:url" content="https://beat-yt.github.io/fast.com-speedtest.net/" />
-	<meta property="og:image" content="//b.cdnst.net/images/share-logo.png" />
-	<meta property="og:image:type" content="image/png" />
-	<meta property="og:image:width" content="382" />
-	<meta property="og:image:height" content="200" />
-    
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Speedtest by Ookla - Using Netflix's server" />
+    <meta property="og:description"
+        content="How fast is your download speed? In seconds, FAST.com's simple Internet speed test will estimate your ISP speed using speedtest.net modern interface." />
+    <meta property="og:site_name" content="Speedtest.net" />
+    <meta property="og:url" content="https://beat-yt.github.io/fast.com-speedtest.net/" />
+    <meta property="og:image" content="//b.cdnst.net/images/share-logo.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="382" />
+    <meta property="og:image:height" content="200" />
+
     <title>Speedtest Custom - Test your internet speeds</title>
     <link rel="stylesheet" type="text/css"
         href="https://c.speedtestcustom.com/static/css/gauge.min.css?v=1646866193322" />
     <script>
-        // todo: maybe put it in the speed test "testBundle.js" so that it execute that async and show "finding server" to user
-        const request = new XMLHttpRequest();
-        request.open('GET', 'https://mixte-proxy.herokuapp.com/https://fast.com/', false);
-        request.send();
+        let API_TOKEN = localStorage.getItem('FAST_APP_TOKEN') || 'YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm';
+        const REDIRECT_NULL_CORS_URL = 'https://httpbingo.org/redirect-to?status_code=302&url=';
 
-        var fastcom_main_script_matches = /\<script src=\"(\/app-.{3,8}[.]js)\">\<\/script\>/.exec(request.responseText);
+        function getAPItoken() {
+            const request = new XMLHttpRequest();
+            // todo: maybe put it in the speed test "testBundle.js" so that it execute that async and show "finding server" to user
+            request.open('GET', 'https://mixte-proxy.herokuapp.com/https://fast.com/', false);
+            request.send();
 
-        var fastcom_main_script = fastcom_main_script_matches[1]
 
-        console.log(fastcom_main_script)
+            var fastcom_main_script_matches = /\<script src=\"(\/app-.{3,8}[.]js)\">\<\/script\>/.exec(request.responseText);
+            var fastcom_main_script = fastcom_main_script_matches[1]
 
-        request.open('GET', 'https://mixte-proxy.herokuapp.com/https://fast.com' + fastcom_main_script, false);
-        request.send();
+            request.open('GET', 'https://mixte-proxy.herokuapp.com/https://fast.com' + fastcom_main_script, false);
+            request.send();
 
-        console.log(request.responseText)
+            var fastcom_token_matches = /token[:]\"(.+?(?=[\",]))\"/.exec(request.responseText)
+            var fastcom_token = fastcom_token_matches[1];
 
-        var fastcom_token_matches = /token[:]\"(.+?(?=[\",]))\"/.exec(request.responseText)
-        var fastcom_token = fastcom_token_matches[1]
-        console.log(fastcom_token)
+            localStorage.setItem('FAST_APP_TOKEN', fastcom_token);
 
-        request.open('GET', `https://httpbingo.org/redirect-to?status_code=302&url=${encodeURIComponent(`https://api.fast.com/netflix/speedtest/v2?https=true&token=${fastcom_token}&urlCount=5`)}`, false);
-        request.send();
+            return fastcom_token;
+        }
 
-        /**
-         * @type 
-         */
-        const fastcom_data = JSON.parse(request.responseText);
+        function getFastApiData(token) {
+            const request = new XMLHttpRequest();
+            request.open('GET', REDIRECT_NULL_CORS_URL + encodeURIComponent(`https://api.fast.com/netflix/speedtest/v2?https=true&token=${token}&urlCount=5`), false);
+            request.send();
+            return request.status == 200 ? JSON.parse(request.responseText) : null;
+        }
 
-        request.open('GET', `https://ipwhois.app/json/`, false);
-        request.send();
+        function getIPData() {
+            const request = new XMLHttpRequest();
+            request.open('GET', `https://ipwhois.app/json/`, false);
+            request.send();
 
-        /**
-         * @type {{"ip":"","success":true,"type":"IPv4","continent":"North America","continent_code":"NA","country":"Canada","country_code":"CA","country_flag":"https://cdn.ipwhois.io/flags/ca.svg","country_capital":"Ottawa","country_phone":"+1","country_neighbours":"US","region":"Québec","city":"Montreal","latitude":8.5016889,"longitude":-8.567256,"asn":"AS577","org":"Bell Canada","isp":"Bell Canada","timezone":"America/Toronto","timezone_name":"Eastern Standard Time","timezone_dstOffset":0,"timezone_gmtOffset":-18000,"timezone_gmt":"GMT -5:00","currency":"Canadian Dollar","currency_code":"CAD","currency_symbol":"$","currency_rates":1.248,"currency_plural":"Canadian Dollars","completed_requests":11}}
-         */
-        const myIpData = JSON.parse(request.responseText)
+            while (request.status != 200) {
+                request.open('GET', `https://ipwhois.app/json/`, false);
+                request.send();
+            }
 
+            return JSON.parse(request.responseText);
+        }
+
+
+        let fastcom_data = getFastApiData(API_TOKEN);
+
+        if (fastcom_data == null) {
+            API_TOKEN = getAPItoken();
+            fastcom_data = getFastApiData(API_TOKEN);
+            if (!fastcom_data) {
+                fastcom_data = {
+                    "client": {
+                        "ip": "",
+                        "asn": "",
+                        "isp": "",
+                        "location": {
+                            "city": "",
+                            "country": ""
+                        }
+                    },
+                    "targets": []
+                };
+            }
+        }
+
+        const myIpData = getIPData();
 
         window.ST_PARAMS = {
             'fastcom_data': fastcom_data,
@@ -101,7 +134,7 @@
                     "ping",
                     "download",
                     "upload",
-                   // "jitter"
+                    // "jitter"
                 ],
                 "ipServerAssignment": {
                     "allowed": false,
