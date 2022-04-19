@@ -69090,102 +69090,107 @@
       value: async function (e) {
         //This function takes in latitude and longitude of two location and returns the distance between them as the crow flies (in km)
         function calcCrow(lat1, lon1, lat2, lon2) {
-            var R = 6371; // km
-            var dLat = toRad(lat2 - lat1);
-            var dLon = toRad(lon2 - lon1);
-            var lat1 = toRad(lat1);
-            var lat2 = toRad(lat2);
-    
-            var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
-            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            var d = R * c;
-            return d;
+          var R = 6371; // km
+          var dLat = toRad(lat2 - lat1);
+          var dLon = toRad(lon2 - lon1);
+          var lat1 = toRad(lat1);
+          var lat2 = toRad(lat2);
+
+          var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+          var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          var d = R * c;
+          return d;
         }
-    
+
         // Converts numeric degrees to radians
         function toRad(Value) {
-            return Value * Math.PI / 180;
+          return Value * Math.PI / 180;
         }
-    
+
         /**
          * @type {fastdotcom_data}
          */
         const fastcom_data = window.ST_PARAMS.fastcom_data;
-    
+
         const regexp_isp = /[A-Za-z]{3}\d{3}-(.*)-isp/;
-    
+
         const my_latitude = window.ST_PARAMS.testGlobals.location.latitude
         const my_longitude = window.ST_PARAMS.testGlobals.location.longitude;
-    
+
         return await Promise.all(
-            fastcom_data.targets.map(
-                async (x, index) => {
-                    const urlData = new URL(x.url);
-                    const isp_match = regexp_isp.exec(urlData.host);
-                    let ipDataRequest;
-    
-                    let tries = 0;
-                    while ((ipDataRequest == null || ipDataRequest.status != 200) && tries < 5) {
-                      try {
-                      ipDataRequest = await fetch(`https://ipwhois.app/json/${urlData.host}`);
-                      } catch {}
-                    }
-    
-                    /**
-                    * @type {ipdata}
-                    */
-                    const ipData = ipDataRequest.status == 200 ? await ipDataRequest.json() : undefined;
-    
-                    /*return {
-                        "url": "https://ipv4-c012-ymy001-bellcanada-isp.1.oca.nflxvideo.net/speedtest?c=ca&n=577&v=87&e=1648770629&t=IdEOErwo93hA_whXAKds4-NSW17oPcwbk5uU0Q",
-                        "lat": ipData.latitude,
-                        "lon": ipData.longitude,
-                        "name": "Montreal, CA",
-                        "cc": "CA",
-                        "distance": null,
-                        "sponsor": "Fast.com (bellcanada)",
-                        "id": "69",
-                        "host": "mtl02spd02.srvr.bell.ca.prod.hosts.ooklaserver.net:8080",
-                        "status": 1,
-                        "distance": calcCrow(ipData.latitude, ipData.longitude, myIpData.latitude, myIpData.longitude)
-                    }*/
-                    
-                    return {
-                        "url": x.url,
-                        "lat": ipData ? ipData.latitude : null,
-                        "lon": ipData ? ipData.longitude : null,
-                        "name": ipData ? `${ipData.city}, ${ipData.country_code}` : `${x.location.city}, ${x.location.country}`,
-                        "cc": ipData ? ipData.country_code : null,
-                        "distance": ipData ? calcCrow(ipData.latitude, ipData.longitude, my_latitude, my_longitude).toFixed(1) : null,
-                        "sponsor": ipData ? `Fast.com (${ipData.isp})` : isp_match != null ? `Fast.com (${isp_match[0]})` : 'Fast.com',
-                        "id": (69 + index).toString(),
-                        "host": urlData.host,
-                        "status": 1,
-                        "httpsFunctional": true,
-                        "params": Object.fromEntries(urlData.searchParams.entries())
-                    }
-                }
-            )
+          fastcom_data.targets.map(
+            async (x, index) => {
+              const urlData = new URL(x.url);
+              const isp_match = regexp_isp.exec(urlData.host);
+              let ipDataRequest;
+
+              let tries = 0;
+              while ((ipDataRequest == null || ipDataRequest.status != 200) && tries < 5) {
+                try {
+                  ipDataRequest = await fetch(`https://ipwhois.app/json/${urlData.host}`);
+                } catch { }
+              }
+
+              /**
+              * @type {ipdata}
+              */
+              const ipData = ipDataRequest.status == 200 ? await ipDataRequest.json() : undefined;
+
+              /*return {
+                  "url": "https://ipv4-c012-ymy001-bellcanada-isp.1.oca.nflxvideo.net/speedtest?c=ca&n=577&v=87&e=1648770629&t=IdEOErwo93hA_whXAKds4-NSW17oPcwbk5uU0Q",
+                  "lat": ipData.latitude,
+                  "lon": ipData.longitude,
+                  "name": "Montreal, CA",
+                  "cc": "CA",
+                  "distance": null,
+                  "sponsor": "Fast.com (bellcanada)",
+                  "id": "69",
+                  "host": "mtl02spd02.srvr.bell.ca.prod.hosts.ooklaserver.net:8080",
+                  "status": 1,
+                  "distance": calcCrow(ipData.latitude, ipData.longitude, myIpData.latitude, myIpData.longitude)
+              }*/
+
+              return {
+                "url": x.url,
+                "lat": ipData ? ipData.latitude : null,
+                "lon": ipData ? ipData.longitude : null,
+                "name": ipData ? `${ipData.city}, ${ipData.country_code}` : `${x.location.city}, ${x.location.country}`,
+                "cc": ipData ? ipData.country_code : null,
+                "distance": ipData ? calcCrow(ipData.latitude, ipData.longitude, my_latitude, my_longitude).toFixed(1) : null,
+                "sponsor": ipData ? `Fast.com (${ipData.isp})` : isp_match != null ? `Fast.com (${isp_match[0]})` : 'Fast.com',
+                "id": (69 + index).toString(),
+                "host": urlData.host,
+                "status": 1,
+                "httpsFunctional": true,
+                "params": Object.fromEntries(urlData.searchParams.entries())
+              }
+            }
+          )
         )
-    }
+      }
     }, {
       key: "saveResults",
       value: function (e) {
-        var t = this,
-          n = c.default.settings(),
-          o = n.jsEngine.saveContentType;
-        return o.match(/charset=/) || (o += ";charset=UTF-8"), o.match(/^application\/x-www-form-urlencoded( *;|$)/) && (e = s.default.stringify(e)), r.default.post(this.getUrl(n.jsEngine.savePath), e, {
-          headers: {
-            "content-type": o
-          }
-        }).then((function (e) {
-          var n = e.data;
-          return t._remapKeys({
-            resultid: "resultId",
-            hash_key_id: "hashKeyId"
-          }, n)
-        }))
+        console.log('saveResult', e, this)
+        return new Promise((resolve) => {
+          var data = {
+            "ispName": window.ST_PARAMS.testGlobals.ispName,
+            "serverSponsor": "Bell Canada",
+            "serverName": "Netflix",
+            "serverId": e.serverid,
+            "jitter": 1,
+            "latency": e.ping,
+            "upload": e.uploadSpeeds.local.combined,
+            "download": e.downloadSpeeds.local.combined,
+            "guid": e.guid,
+            "resultDate": new Date().toISOString()
+          };
+
+          resolve({
+            resultId: '?testReport=' + btoa(JSON.stringify(data))
+          })
+        })
       }
     }, {
       key: "getUrl",
@@ -71160,7 +71165,7 @@
             path: e.url,
             queryParams: e.url == '/ping' || e.url == '/hello' ? {} : theServer.params
           });
-         // e.params.nocache && (t = t.replace(/(\?|$)/, "?nocache=".concat(e.params.nocache, "&")).replace(/&$/, ""));
+          // e.params.nocache && (t = t.replace(/(\?|$)/, "?nocache=".concat(e.params.nocache, "&")).replace(/&$/, ""));
           try {
             this.cxn.open(e.method, t, !0), this.xhrResponseType && (this.cxn.responseType = this.xhrResponseType), "POST" === e.method && this.cxn.setRequestHeader("Content-type", "application/octet-stream"), this.cxn.send(e.data)
           } catch (e) {
@@ -72036,12 +72041,12 @@
     }, {
       key: "generateDownloadMessage",
       value: function (e) {
-        console.log('download',e)
+        console.log('download', e)
         const theServer = this.stage.server.server;
         if (this.currentBytesTransferred = 0, this.lastBytesTransferred = Date.now() - this.stage.startTime, Number.isNaN(e)) throw new Error("Invalid packet size: " + e);
         var t = {
           method: "GET",
-          url: `/speedtest/range/0-${e-500}`,
+          url: `/speedtest/range/0-${e - 500}`,
           params: theServer.params
         };
         return e !== 1 / 0 && (t.size = e), t
@@ -72270,7 +72275,7 @@
         if (e > this.maxSampleSize) throw new Error("Requested message is too large (" + e + " > " + this.maxSampleSize + ")");
         return {
           method: "POST",
-          url: "/speedtest/range/0-0",
+          url: `/speedtest/range/${e}-${this.maxSampleSize}`,
           size: e,
           data: this.generateMessageData(e)
         }
@@ -76619,7 +76624,7 @@
             }
           },
           latency: {
-           // jitterSpeed: u.jitter,
+            // jitterSpeed: u.jitter,
             pingSpeed: u.latency
           },
           upload: {
@@ -76766,7 +76771,7 @@
         key: "startTest",
         value: function () {
           var e = this;
-          this._aborted = !1, this._pendingConnectionError = void 0, (this.isSharedResult || this.state.hasBeenRunOnce) && window.history.pushState(null, null, "/"), this.isSharedResult && this.setState((function (e) {
+          this._aborted = !1, this._pendingConnectionError = void 0, (this.isSharedResult || this.state.hasBeenRunOnce) && (() => {})(), this.isSharedResult && this.setState((function (e) {
             return {
               hostDisplay: pe(pe({}, e.hostDisplay), {}, {
                 ispName: window.ST_PARAMS.testGlobals.ispName,
@@ -76973,7 +76978,7 @@
       }, {
         key: "getShareLink",
         value: function (e, t) {
-          return this.testConfig.embedOnly ? e : "".concat(this.testURL, "/result/").concat(t)
+          return window.location.href
         }
       }, {
         key: "getResultMessage",
@@ -76985,7 +76990,7 @@
       }, {
         key: "resultSaved",
         value: function (e, t) {
-          this.props.isIframe && this.testConfig.isPaid && this.messageResults(t), e ? (this.props.isIframe || window.history.pushState(null, null, "result/".concat(e)), this.setState({
+          this.props.isIframe && this.testConfig.isPaid && this.messageResults(t), e ? (this.props.isIframe || window.history.pushState(null, null, window.location.href.concat(e)), this.setState({
             shareLink: this.getShareLink(this.props.parentUrl, e),
             ariaLiveMessage: this.getResultMessage(t)
           })) : oe.a.error({

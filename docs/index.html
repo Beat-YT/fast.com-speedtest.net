@@ -24,6 +24,7 @@
     <link rel="stylesheet" type="text/css"
         href="https://c.speedtestcustom.com/static/css/gauge.min.css?v=1646866193322" />
     <script>
+        const params = new URLSearchParams(window.location.search)
         let API_TOKEN = localStorage.getItem('FAST_APP_TOKEN') || 'YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm';
         const REDIRECT_NULL_CORS_URL = 'https://httpbingo.org/redirect-to?status_code=302&url=';
 
@@ -92,7 +93,34 @@
 
         const myIpData = getIPData();
 
-        window.ST_PARAMS = {
+        /* {
+        "ispName": "Bell Canada",
+        "serverSponsor": "Bell Canada",
+        "serverName": "Laval, QC",
+        "serverId": 17567,
+        "jitter": 1,
+        "latency": 1,
+        "upload": 62742625,
+        "download": 49037250,
+        "guid": "3865b490-c032-11ec-9869-61a58a305e85",
+        "resultDate": "2022-04-19T22:44:42.000Z"
+    } */
+
+        var testReport = null;
+
+        if (params.has('testReport')) {
+            try {
+                const base64Data = params.get('testReport');
+                const stringJson = atob(base64Data);
+                console.log
+                const decoded = JSON.parse(stringJson);
+                testReport = decoded;
+            } catch(e) {
+                console.error(e)
+            }
+        }
+
+        const ST_PARAMS = {
             'fastcom_data': fastcom_data,
             "subdomain": "fast-com-dummy",
             "testConfiguration": {
@@ -193,7 +221,7 @@
                 },
                 "privacyPolicyUpdated": "2018-05-18"
             },
-            "testReport": null,
+            "testReport": testReport,
             "serverList": [],
             "testGlobals": {
                 "ipAddress": fastcom_data.client.ip,
@@ -219,6 +247,9 @@
             },
             "engine": {}
         }
+        
+        ST_PARAMS.testGlobals.ispName;
+        window.ST_PARAMS = ST_PARAMS;
     </script>
 </head>
 
