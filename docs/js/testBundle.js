@@ -69176,7 +69176,7 @@
         return new Promise((resolve) => {
           var data = {
             "ispName": window.ST_PARAMS.testGlobals.ispName,
-            "serverSponsor": "Bell Canada",
+            "serverSponsor": "Fast.com",
             "serverName": "Netflix",
             "serverId": e.serverid,
             "jitter": 1,
