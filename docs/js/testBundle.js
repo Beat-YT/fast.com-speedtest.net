@@ -52111,13 +52111,13 @@
       c = {
         firefox: {
           download: {
-            connectionProtocol: "ws"
+            connectionProtocol: "xhr"
           }
         },
         edge: {
           upload: {
             numConnections: 1,
-            connectionProtocol: "ws"
+            connectionProtocol: "xhr"
           }
         }
       },
@@ -52140,7 +52140,7 @@
         timeLimit: 2e3
       },
       data: {
-        connectionProtocol: "ws",
+        connectionProtocol: "xhr",
         progressInterval: 50,
         testLength: 2e3,
         packetSize: 2e4
